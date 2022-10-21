@@ -1,0 +1,33 @@
+
+
+service: curso-sls-archivos-s3
+
+custom:
+  bucket: curso-sls # create bucket in s3 amazon
+  default_stage: dev # deafult env
+  apigwBinary:
+    types:  #list of mime-types 
+      - '*/*'
+
+plugins:
+  - serverless-apigw-binary # allow any type of MIME TYPES, key for this to work
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  profile: default
+  stage: ${opt:stage, self:custom.default_stage} # by defect the value that has been set in the deployment or default stage
+  apiGateway:
+    binaryMediaTypes:
+      - '*/*'
+functions:
+  updloadS3File:
+    handler: handler.app # name of handler in module exports app
+    environment:
+      bucket: ${self:custom.bucket}-${self:provider.stage} # name and stage of bucket env variable
+    events:
+      - http:
+          path: /upload
+          method: post

@@ -1,0 +1,21 @@
+service: api-keys # NOTE: update this with your service name
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  profile: default
+  stage: ${opt:stage, 'dev'}
+  region: us-east-1
+  
+  apiKeys:
+    # we are able to search a file name: config.name of stage.json and then search for API_KEY variable value
+    - ${file(./config.${self:provider.stage}.json):API_KEY} 
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+    - http:
+        path: /
+        method: get
+        private: true
